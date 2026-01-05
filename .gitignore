@@ -1,0 +1,12 @@
+
+# build artifacts
+main.js
+manifest.json
+styles.css
+
+# npm
+node_modules
+package-lock.json
+
+# obsidian
+.obsidian
