@@ -1,6 +1,7 @@
 
 # build artifacts
 main.js
+data.json
 
 # npm
 node_modules
