@@ -13,13 +13,17 @@ export class LLMService {
             throw new Error('API Key is missing. Please configure it in settings.');
         }
 
-        const url = `${this.settings.apiBaseUrl}/chat/completions`;
-        
+        // Remove trailing slash from base URL if present
+        const baseUrl = this.settings.apiBaseUrl.replace(/\/$/, '');
+        const url = `${baseUrl}/chat/completions`;
+
         const body = {
             model: this.settings.modelName,
             messages: messages,
             temperature: 0.7
         };
+
+        console.log('Calling LLM:', url, body);
 
         const params: RequestUrlParam = {
             url: url,
@@ -33,6 +37,8 @@ export class LLMService {
 
         try {
             const response = await requestUrl(params);
+            console.log('LLM Response Status:', response.status);
+            
             const data = response.json;
             if (data.error) {
                 throw new Error(data.error.message || 'Unknown API Error');
@@ -40,6 +46,12 @@ export class LLMService {
             return data.choices[0].message.content;
         } catch (error) {
             console.error('LLM Call Failed:', error);
+            if (error.status === 401) {
+                throw new Error('Invalid API Key (401 Unauthorized)');
+            }
+            if (error.status === 404) {
+                throw new Error('Model or Endpoint not found (404). Check Base URL and Model Name.');
+            }
             throw error;
         }
     }
@@ -51,7 +63,7 @@ export class LLMService {
         ];
 
         const response = await this.callLLM(messages);
-        
+
         try {
             // Try to parse JSON if the model returns a JSON string
             // Sometimes models wrap JSON in markdown code blocks

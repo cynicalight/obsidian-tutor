@@ -22,13 +22,13 @@ export class ReviewService {
         }
 
         const lastContent = LZString.decompressFromUTF16(reviewData.lastContentSnapshot);
-        
+
         if (!lastContent) {
-             return currentContent; // Decompression failed or empty
+            return currentContent; // Decompression failed or empty
         }
 
         const diffs = Diff.diffLines(lastContent, currentContent);
-        
+
         let newContent = '';
         diffs.forEach((part) => {
             if (part.added) {
@@ -42,7 +42,7 @@ export class ReviewService {
     async saveSnapshot(file: TFile, score: string) {
         const currentContent = await this.app.vault.read(file);
         const compressed = LZString.compressToUTF16(currentContent);
-        
+
         if (!this.plugin.settings.reviews) {
             this.plugin.settings.reviews = {};
         }

@@ -3,6 +3,7 @@ import SmartReviewerPlugin from '../main';
 import { ReviewService } from '../ReviewService';
 import { LLMService } from '../LLMService';
 import { TFile } from 'obsidian';
+import { SkeletonLoader } from './SkeletonLoader';
 
 interface ReviewModeProps {
     plugin: SmartReviewerPlugin;
@@ -17,7 +18,11 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
     const [currentFile, setCurrentFile] = React.useState<TFile | null>(null);
 
     const reviewService = React.useMemo(() => new ReviewService(plugin.app, plugin), [plugin]);
-    const llmService = React.useMemo(() => new LLMService(plugin.settings), [plugin.settings]);
+    const llmService = React.useMemo(() => new LLMService(plugin.settings), [
+        plugin.settings.apiKey, 
+        plugin.settings.apiBaseUrl, 
+        plugin.settings.modelName
+    ]);
 
     const startReview = async () => {
         const file = plugin.app.workspace.getActiveFile();
@@ -77,7 +82,13 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
     }
 
     if (status === 'loading') {
-        return <div>Loading...</div>;
+        return (
+            <div className="review-mode">
+                <h3>Generating...</h3>
+                <SkeletonLoader />
+                <SkeletonLoader />
+            </div>
+        );
     }
 
     if (status === 'quiz') {

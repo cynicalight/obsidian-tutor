@@ -1,6 +1,7 @@
 import * as React from 'react';
 import SmartReviewerPlugin from '../main';
 import { LLMService } from '../LLMService';
+import { SkeletonLoader } from './SkeletonLoader';
 
 interface ChatModeProps {
     plugin: SmartReviewerPlugin;
@@ -16,7 +17,12 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
     const [input, setInput] = React.useState('');
     const [loading, setLoading] = React.useState(false);
     
-    const llmService = React.useMemo(() => new LLMService(plugin.settings), [plugin.settings]);
+    // Re-create service when settings change
+    const llmService = React.useMemo(() => new LLMService(plugin.settings), [
+        plugin.settings.apiKey, 
+        plugin.settings.apiBaseUrl, 
+        plugin.settings.modelName
+    ]);
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -27,17 +33,21 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
             context = await plugin.app.vault.read(file);
         }
 
-        const newMessages = [...messages, { role: 'user', content: input } as Message];
+        const userMsg: Message = { role: 'user', content: input };
+        const newMessages = [...messages, userMsg];
+        
         setMessages(newMessages);
         setInput('');
         setLoading(true);
 
         try {
-            const response = await llmService.chatWithNote(input, context);
-            setMessages([...newMessages, { role: 'assistant', content: response }]);
+            console.log('Sending message to LLM...');
+            const response = await llmService.chatWithNote(userMsg.content, context);
+            console.log('Received response:', response);
+            setMessages(prev => [...prev, { role: 'assistant', content: response }]);
         } catch (e) {
-            console.error(e);
-            setMessages([...newMessages, { role: 'assistant', content: 'Error: ' + e.message }]);
+            console.error('Chat Error:', e);
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: ' + (e.message || String(e)) }]);
         } finally {
             setLoading(false);
         }
@@ -52,14 +62,27 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
                         <p>{m.content}</p>
                     </div>
                 ))}
+                {loading && (
+                    <div className="message assistant">
+                        <strong>AI:</strong>
+                        <SkeletonLoader />
+                    </div>
+                )}
             </div>
             <div className="input-area">
                 <textarea 
                     value={input} 
                     onChange={(e) => setInput(e.target.value)}
                     disabled={loading}
+                    placeholder="Ask a question..."
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    }}
                 />
-                <button onClick={sendMessage} disabled={loading}>Send</button>
+                <button onClick={sendMessage} disabled={loading || !input.trim()}>Send</button>
             </div>
         </div>
     );

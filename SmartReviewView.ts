@@ -27,7 +27,7 @@ export class SmartReviewView extends ItemView {
         const container = this.containerEl.children[1];
         container.empty();
         const rootEl = container.createDiv();
-        
+
         this.root = ReactDOM.createRoot(rootEl);
         this.root.render(
             React.createElement(ReactApp, { plugin: this.plugin })
