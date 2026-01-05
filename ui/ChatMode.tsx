@@ -2,6 +2,7 @@ import * as React from 'react';
 import SmartReviewerPlugin from '../main';
 import { LLMService } from '../LLMService';
 import { SkeletonLoader } from './SkeletonLoader';
+import { MarkdownContent } from './MarkdownContent';
 
 interface ChatModeProps {
     plugin: SmartReviewerPlugin;
@@ -58,13 +59,17 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
             <div className="messages">
                 {messages.map((m, i) => (
                     <div key={i} className={`message ${m.role}`}>
-                        <strong>{m.role === 'user' ? 'You' : 'AI'}:</strong>
-                        <p>{m.content}</p>
+                        <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong>
+                        {m.role === 'assistant' ? (
+                            <MarkdownContent content={m.content} plugin={plugin} />
+                        ) : (
+                            <p>{m.content}</p>
+                        )}
                     </div>
                 ))}
                 {loading && (
                     <div className="message assistant">
-                        <strong>AI:</strong>
+                        <strong>Tutor:</strong>
                         <SkeletonLoader />
                     </div>
                 )}

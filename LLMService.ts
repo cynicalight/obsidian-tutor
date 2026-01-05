@@ -38,7 +38,7 @@ export class LLMService {
         try {
             const response = await requestUrl(params);
             console.log('LLM Response Status:', response.status);
-            
+
             const data = response.json;
             if (data.error) {
                 throw new Error(data.error.message || 'Unknown API Error');
