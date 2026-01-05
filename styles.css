@@ -1,0 +1,191 @@
+/* Styles for Smart Reviewer Plugin */
+
+:root {
+    --tutor-shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --tutor-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+    --tutor-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+    --tutor-radius-lg: 12px;
+    --tutor-radius-md: 8px;
+    --tutor-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.theme-light {
+    --tutor-shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --tutor-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.08);
+    --tutor-border-subtle: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.smart-reviewer-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    background-color: var(--background-primary);
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    background: var(--background-secondary);
+    padding: 4px;
+    border-radius: var(--tutor-radius-lg);
+}
+
+.nav-buttons button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    border-radius: var(--tutor-radius-md);
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: var(--tutor-transition);
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.nav-buttons button:hover {
+    background-color: var(--background-modifier-hover);
+    transform: translateY(-1px);
+}
+
+.nav-buttons button.active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px; /* Space for scrollbar */
+}
+
+/* Cards (Questions, Evaluations, Messages) */
+.question-block, 
+.evaluation-block,
+.message {
+    background-color: var(--background-secondary);
+    padding: 16px;
+    border-radius: var(--tutor-radius-lg);
+    border: var(--tutor-border-subtle);
+    box-shadow: var(--tutor-shadow-soft);
+    margin-bottom: 16px;
+    transition: var(--tutor-transition);
+}
+
+.question-block:hover,
+.evaluation-block:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--tutor-shadow-hover);
+}
+
+/* Inputs */
+.question-block textarea,
+.input-area textarea {
+    width: 100%;
+    background-color: var(--background-primary);
+    border: var(--tutor-border-subtle);
+    border-radius: var(--tutor-radius-md);
+    padding: 10px;
+    transition: var(--tutor-transition);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.question-block textarea:focus,
+.input-area textarea:focus {
+    border-color: var(--interactive-accent);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+/* Chat Mode */
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 16px;
+}
+
+.message {
+    max-width: 85%;
+    line-height: 1.5;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-bottom-right-radius: 2px;
+}
+
+.message.assistant {
+    align-self: flex-start;
+    background-color: var(--background-secondary);
+    border-bottom-left-radius: 2px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.input-area button,
+.review-mode button {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: var(--tutor-radius-md);
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--tutor-transition);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.input-area button:hover,
+.review-mode button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.input-area button:disabled,
+.review-mode button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Skeleton Loader */
+.skeleton-loader {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.skeleton-line {
+    height: 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, 
+        var(--background-modifier-border) 25%, 
+        var(--background-secondary-alt) 50%, 
+        var(--background-modifier-border) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

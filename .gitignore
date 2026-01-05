@@ -1,8 +1,6 @@
 
 # build artifacts
 main.js
-manifest.json
-styles.css
 
 # npm
 node_modules
