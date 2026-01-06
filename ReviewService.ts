@@ -25,15 +25,15 @@ export class ReviewService {
 
         for (const heading of headings) {
             const startOffset = heading.position.end.offset;
-            
+
             // Find the end index
             // The section ends at the start of the next heading of the same or higher level (lower number)
             // Or the end of the file
             let endOffset = content.length;
-            
-            const currentIndex = allHeadings.findIndex(h => 
-                h.heading === heading.heading && 
-                h.level === heading.level && 
+
+            const currentIndex = allHeadings.findIndex(h =>
+                h.heading === heading.heading &&
+                h.level === heading.level &&
                 h.position.start.line === heading.position.start.line
             );
 
