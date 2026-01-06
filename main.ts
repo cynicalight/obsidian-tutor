@@ -132,11 +132,11 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.language = value;
                     await this.plugin.saveSettings();
+                }));
+
         new Setting(containerEl)
             .setName('Prompts')
-            .setHeading(
-
-        containerEl.createEl('h3', { text: 'Prompts' });
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Quiz Generator Prompt')
