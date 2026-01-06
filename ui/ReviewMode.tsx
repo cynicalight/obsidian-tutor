@@ -1,15 +1,16 @@
 import * as React from 'react';
-import SmartReviewerPlugin from '../main';
+import { TutorContext } from './types';
 import { ReviewService } from '../ReviewService';
 import { LLMService } from '../LLMService';
-import { TFile, HeadingCache } from 'obsidian';
+import { TFile, HeadingCache, Notice } from 'obsidian';
 import { SkeletonLoader } from './SkeletonLoader';
 
 interface ReviewModeProps {
-    plugin: SmartReviewerPlugin;
+    context: TutorContext;
 }
 
-export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
+export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
+    const { app, settings, saveSettings } = context;
     const [status, setStatus] = React.useState<'idle' | 'loading' | 'selecting_chapters' | 'quiz' | 'result'>('idle');
     const [diffContent, setDiffContent] = React.useState<string>('');
     const [questions, setQuestions] = React.useState<string[]>([]);
@@ -18,40 +19,44 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
     const [currentFile, setCurrentFile] = React.useState<TFile | null>(null);
     const [availableHeadings, setAvailableHeadings] = React.useState<HeadingCache[]>([]);
     const [selectedHeadings, setSelectedHeadings] = React.useState<Set<number>>(new Set());
+    const [confirmRestart, setConfirmRestart] = React.useState(false);
 
-    const isZh = plugin.settings.language === 'zh';
+    const isZh = settings.language === 'zh';
     const t = {
         startPrompt: isZh ? '点击开始以复习此笔记的变更。' : 'Click start to review new changes in this note.',
-        startBtn: isZh ? '开始复习' : 'Start Review',
-        submitBtn: isZh ? '提交答案' : 'Submit Answers',
+        startBtn: isZh ? '开始复习' : 'Start review',
+        submitBtn: isZh ? '提交答案' : 'Submit answers',
         
         // Translation updates
         noChanges: isZh ? '没有检测到新变更。' : 'No new changes detected.',
         chooseAction: isZh ? '请选择操作：' : 'Select an action:',
-        generalReview: isZh ? '总复习 (选择章节)' : 'General Review (Select Chapters)',
+        generalReview: isZh ? '总复习 (选择章节)' : 'General review (select chapters)',
         selectChapters: isZh ? '选择要复习的章节：' : 'Select chapters to review:',
-        startGeneralReview: isZh ? '开始章节复习' : 'Start Chapter Review',
+        startGeneralReview: isZh ? '开始章节复习' : 'Start chapter review',
         cancel: isZh ? '取消' : 'Cancel',
 
         doneBtn: isZh ? '完成' : 'Done',
         restartBtn: isZh ? '重新开始' : 'Restart',
-        restartConfirm: isZh ? '确定要重新开始吗？当前进度将丢失。' : 'Are you sure you want to restart? Current progress will be lost.',
-        reviewTitle: isZh ? '复习变更' : 'Review Changes',
+        restartConfirm: isZh ? '确认重开?' : 'Sure to restart?',
+        reviewTitle: isZh ? '复习变更' : 'Review changes',
         feedback: isZh ? '反馈：' : 'Feedback:',
         question: isZh ? '问题' : 'Q',
+        error: isZh ? '错误' : 'Error',
     };
 
-    const reviewService = React.useMemo(() => new ReviewService(plugin.app, plugin), [plugin]);
-    const llmService = React.useMemo(() => new LLMService(plugin.settings), [
-        plugin.settings.apiKey, 
-        plugin.settings.apiBaseUrl, 
-        plugin.settings.modelName
+    const reviewService = React.useMemo(() => new ReviewService(app, settings, saveSettings), 
+        [app, settings, saveSettings]);
+        
+    const llmService = React.useMemo(() => new LLMService(settings), [
+        settings.apiKey, 
+        settings.apiBaseUrl, 
+        settings.modelName
     ]);
 
     const startReview = async () => {
-        const file = plugin.app.workspace.getActiveFile();
+        const file = app.workspace.getActiveFile();
         if (!file) {
-            // Show notice
+            new Notice(t.noChanges); // Just reuse this or generic error
             return;
         }
         setCurrentFile(file);
@@ -61,16 +66,12 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
             const diff = await reviewService.getNewContent(file);
             
             if (!diff || diff.trim().length === 0) {
-                // No changes - Offer General Review
                 const requestHeadings = reviewService.getHeadings(file);
                 if (requestHeadings && requestHeadings.length > 0) {
                     setAvailableHeadings(requestHeadings);
                     setStatus('selecting_chapters');
                 } else {
-                    // No headings found either, maybe just alert?
-                    // For now, let's keep it simple and just reset to idle with a notice 
-                    // Or ideally render a message "No changes and no headings found"
-                     alert(t.noChanges); 
+                     new Notice(t.noChanges); 
                      setStatus('idle');
                 }
                 return;
@@ -81,8 +82,9 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
             setQuestions(generatedQuestions);
             setAnswers(new Array(generatedQuestions.length).fill(''));
             setStatus('quiz');
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
+            new Notice(t.error + ': ' + e.message);
             setStatus('idle');
         }
     };
@@ -95,13 +97,14 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
             const headingsToReview = availableHeadings.filter((_, i) => selectedHeadings.has(i));
             const content = await reviewService.getContentForHeadings(currentFile, headingsToReview);
             
-            setDiffContent(content); // Use diffContent state to hold the context
+            setDiffContent(content); 
             const generatedQuestions = await llmService.generateQuestions(content);
             setQuestions(generatedQuestions);
             setAnswers(new Array(generatedQuestions.length).fill(''));
             setStatus('quiz');
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
+            new Notice(t.error + ': ' + e.message);
             setStatus('idle');
         }
     };
@@ -141,12 +144,22 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
             setStatus('result');
             
             if (currentFile) {
-                // Calculate average score or just save 'completed'
                 await reviewService.saveSnapshot(currentFile, 'Completed');
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
+            new Notice(t.error + ': ' + e.message);
             setStatus('quiz');
+        }
+    };
+    
+    const handleRestart = () => {
+        if (confirmRestart) {
+            setStatus('idle');
+            setConfirmRestart(false);
+        } else {
+            setConfirmRestart(true);
+            setTimeout(() => setConfirmRestart(false), 3000);
         }
     };
 
@@ -157,11 +170,12 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
                     <p style={{ color: 'var(--text-muted)', marginBottom: '15px' }}>
                         {t.startPrompt}
                     </p>
-                    <button onClick={startReview}>{t.startBtn}</button>
+                    <button onClick={() => void startReview()}>{t.startBtn}</button>
                 </>
             );
         }
-
+        
+        // ... rest of rendering logic same but ensuring no floating promises in onClick ...
         if (status === 'loading') {
             return (
                 <>
@@ -172,7 +186,7 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
         }
 
         if (status === 'selecting_chapters') {
-            return (
+             return (
                 <div style={{ 
                     padding: '10px 0',
                     display: 'flex',
@@ -207,7 +221,7 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
                     </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <button 
-                            onClick={startChapterReview} 
+                            onClick={() => void startChapterReview()} 
                             disabled={selectedHeadings.size === 0}
                             style={{ flex: 1 }}
                         >
@@ -244,14 +258,14 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
                             />
                         </div>
                     ))}
-                    <button onClick={submitAnswers}>{t.submitBtn}</button>
+                    <button onClick={() => void submitAnswers()}>{t.submitBtn}</button>
                 </>
             );
         }
 
         if (status === 'result') {
             return (
-                <>
+                 <>
                     {evaluations.map((evalText, i) => (
                         <div key={i} className="evaluation-block">
                             <p><strong>Q:</strong> {questions[i]}</p>
@@ -271,21 +285,14 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ plugin }) => {
                 <h3 style={{ margin: 0 }}>{t.reviewTitle}</h3>
                 {status !== 'idle' && status !== 'loading' && (
                     <button 
-                        onClick={() => {
-                            if (confirm(t.restartConfirm)) {
-                                setStatus('idle');
-                            }
-                        }} 
+                        onClick={handleRestart} 
                         title={t.restartBtn}
                         style={{ padding: '4px 8px', fontSize: '12px' }}
                     >
-                        ↻ {t.restartBtn}
+                        ↻ {confirmRestart ? t.restartConfirm : t.restartBtn}
                     </button>
                 )}
             </div>
             {renderContent()}
         </div>
     );
-
-    return null;
-};

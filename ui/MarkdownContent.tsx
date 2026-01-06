@@ -1,27 +1,27 @@
 import { MarkdownRenderer } from 'obsidian';
 import * as React from 'react';
-import SmartReviewerPlugin from '../main';
+import { TutorContext } from './types';
 
 interface MarkdownContentProps {
     content: string;
-    plugin: SmartReviewerPlugin;
+    context: TutorContext;
 }
 
-export const MarkdownContent: React.FC<MarkdownContentProps> = ({ content, plugin }) => {
+export const MarkdownContent: React.FC<MarkdownContentProps> = ({ content, context }) => {
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         if (containerRef.current) {
             containerRef.current.empty();
             MarkdownRenderer.render(
-                plugin.app,
+                context.app,
                 content,
                 containerRef.current,
                 '',
-                plugin
+                context.component
             );
         }
-    }, [content, plugin]);
+    }, [content, context]);
 
     return <div ref={containerRef} className="tutor-markdown-content" />;
 };

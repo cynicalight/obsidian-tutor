@@ -27,7 +27,8 @@ export default class SmartReviewerPlugin extends Plugin {
             id: 'open-smart-reviewer',
             name: 'Open Smart Reviewer',
             callback: () => {
-                this.activateView();
+                // Explicitly ignore the promise to satisfy linter
+                void this.activateView();
             }
         });
 
@@ -58,7 +59,7 @@ export default class SmartReviewerPlugin extends Plugin {
         }
     }
 
-    async onunload() {
+    onunload() {
 
     }
 
@@ -84,7 +85,9 @@ class SmartReviewerSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Tutor Settings' });
+        new Setting(containerEl)
+            .setName('Tutor settings')
+            .setHeading();
 
         new Setting(containerEl)
             .setName('API Key')
@@ -129,7 +132,9 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.language = value;
                     await this.plugin.saveSettings();
-                }));
+        new Setting(containerEl)
+            .setName('Prompts')
+            .setHeading(
 
         containerEl.createEl('h3', { text: 'Prompts' });
 

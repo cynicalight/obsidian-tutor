@@ -29,7 +29,7 @@ export class LLMService {
             temperature: 0.7
         };
 
-        console.log('Calling LLM:', url, body);
+        // console.log('Calling LLM:', url, body);
 
         const params: RequestUrlParam = {
             url: url,
@@ -43,7 +43,7 @@ export class LLMService {
 
         try {
             const response = await requestUrl(params);
-            console.log('LLM Response Status:', response.status);
+            // console.log('LLM Response Status:', response.status);
 
             const data = response.json;
             if (data.error) {

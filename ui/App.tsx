@@ -1,13 +1,13 @@
 import * as React from 'react';
-import SmartReviewerPlugin from '../main';
+import { TutorContext } from './types';
 import { ReviewMode } from './ReviewMode';
-import { ChatMode } from './ChatMode'; // Import ChatMode component
+import { ChatMode } from './ChatMode';
 
 interface AppProps {
-    plugin: SmartReviewerPlugin;
+    context: TutorContext;
 }
 
-export const App: React.FC<AppProps> = ({ plugin }) => {
+export const App: React.FC<AppProps> = ({ context }) => {
     const [activeTab, setActiveTab] = React.useState<'review' | 'chat'>('review');
 
     return (
@@ -17,21 +17,21 @@ export const App: React.FC<AppProps> = ({ plugin }) => {
                     className={activeTab === 'review' ? 'active' : ''} 
                     onClick={() => setActiveTab('review')}
                 >
-                    Review Mode
+                    Review mode
                 </button>
                 <button 
                     className={activeTab === 'chat' ? 'active' : ''} 
                     onClick={() => setActiveTab('chat')}
                 >
-                    Chat Mode
+                    Chat mode
                 </button>
             </div>
             <div className="content-area">
                 <div style={{ display: activeTab === 'review' ? 'block' : 'none', height: '100%' }}>
-                    <ReviewMode plugin={plugin} />
+                    <ReviewMode context={context} />
                 </div>
                 <div style={{ display: activeTab === 'chat' ? 'block' : 'none', height: '100%' }}>
-                    <ChatMode plugin={plugin} />
+                    <ChatMode context={context} />
                 </div>
             </div>
         </div>

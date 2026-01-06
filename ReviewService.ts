@@ -1,16 +1,17 @@
 import { TFile, App, HeadingCache } from 'obsidian';
 import * as Diff from 'diff';
 import * as LZString from 'lz-string';
-import SmartReviewerPlugin from './main';
-import { NoteReviewData } from './types';
+import { PluginSettings, NoteReviewData } from './types';
 
 export class ReviewService {
-    plugin: SmartReviewerPlugin;
     app: App;
+    private settings: PluginSettings;
+    private saveSettings: () => Promise<void>;
 
-    constructor(app: App, plugin: SmartReviewerPlugin) {
+    constructor(app: App, settings: PluginSettings, saveSettings: () => Promise<void>) {
         this.app = app;
-        this.plugin = plugin;
+        this.settings = settings;
+        this.saveSettings = saveSettings;
     }
 
     getHeadings(file: TFile): HeadingCache[] {
@@ -56,7 +57,7 @@ export class ReviewService {
 
     async getNewContent(file: TFile): Promise<string> {
         const currentContent = await this.app.vault.read(file);
-        const reviewData = this.plugin.settings.reviews?.[file.path];
+        const reviewData: NoteReviewData | undefined = this.settings.reviews?.[file.path];
 
         if (!reviewData || !reviewData.lastContentSnapshot) {
             return currentContent; // First time review, return full content
@@ -84,13 +85,13 @@ export class ReviewService {
         const currentContent = await this.app.vault.read(file);
         const compressed = LZString.compressToUTF16(currentContent);
 
-        if (!this.plugin.settings.reviews) {
-            this.plugin.settings.reviews = {};
+        if (!this.settings.reviews) {
+            this.settings.reviews = {};
         }
 
-        const existingHistory = this.plugin.settings.reviews[file.path]?.reviewHistory || [];
+        const existingHistory = this.settings.reviews[file.path]?.reviewHistory || [];
 
-        this.plugin.settings.reviews[file.path] = {
+        this.settings.reviews[file.path] = {
             filePath: file.path,
             lastReviewedTime: Date.now(),
             lastContentSnapshot: compressed,
@@ -100,6 +101,6 @@ export class ReviewService {
             ]
         };
 
-        await this.plugin.saveSettings();
+        await this.saveSettings();
     }
 }
