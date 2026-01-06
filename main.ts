@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
     apiKey: '',
     apiBaseUrl: 'https://api.deepseek.com/v1',
     modelName: 'deepseek-chat',
+    language: 'en',
     systemPromptQuiz: "You are a specialized learning assistant. Based strictly on the following text (which represents new updates to a user's note), generate 3 short, conceptual questions to test the user's understanding. Do not ask about trivial details like formatting. Return format: JSON list of strings.",
     systemPromptEvaluate: "You are a helpful tutor. The user was asked: '{question}'. They answered: '{userAnswer}'. The source text is: '{context}'. Evaluate their answer. 1. Score it from 0 to 10. 2. If wrong, correct them using ONLY the information in the source text. 3. Be concise.",
     reviews: {}
@@ -115,6 +116,18 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.modelName)
                 .onChange(async (value) => {
                     this.plugin.settings.modelName = value;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('Language')
+            .setDesc('Language for the UI and LLM responses.')
+            .addDropdown(dropdown => dropdown
+                .addOption('en', 'English')
+                .addOption('zh', 'Chinese')
+                .setValue(this.plugin.settings.language)
+                .onChange(async (value) => {
+                    this.plugin.settings.language = value;
                     await this.plugin.saveSettings();
                 }));
 

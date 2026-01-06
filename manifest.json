@@ -1,9 +1,10 @@
 {
 	"id": "obsidian-tutor",
 	"name": "Tutor",
+	"version": "1.0.3",
 	"minAppVersion": "0.15.0",
 	"description": "An intelligent review assistant using LLMs.",
 	"author": "Jie Zhang",
-	"authorUrl": "https://github.com/yourname/obsidian-tutor",
-	"isDesktopOnly": false
+	"authorUrl": "https://github.com/cynicalight/obsidian-tutor",
+	"isDesktopOnly": true
 }

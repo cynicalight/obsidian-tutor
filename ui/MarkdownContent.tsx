@@ -23,5 +23,5 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({ content, plugi
         }
     }, [content, plugin]);
 
-    return <div ref={containerRef} className="markdown-preview-view" />;
+    return <div ref={containerRef} className="tutor-markdown-content" />;
 };

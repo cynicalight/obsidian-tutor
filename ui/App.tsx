@@ -1,7 +1,7 @@
 import * as React from 'react';
 import SmartReviewerPlugin from '../main';
 import { ReviewMode } from './ReviewMode';
-import { ChatMode } from './ChatMode';
+import { ChatMode } from './ChatMode'; // Import ChatMode component
 
 interface AppProps {
     plugin: SmartReviewerPlugin;
@@ -27,11 +27,12 @@ export const App: React.FC<AppProps> = ({ plugin }) => {
                 </button>
             </div>
             <div className="content-area">
-                {activeTab === 'review' ? (
+                <div style={{ display: activeTab === 'review' ? 'block' : 'none', height: '100%' }}>
                     <ReviewMode plugin={plugin} />
-                ) : (
+                </div>
+                <div style={{ display: activeTab === 'chat' ? 'block' : 'none', height: '100%' }}>
                     <ChatMode plugin={plugin} />
-                )}
+                </div>
             </div>
         </div>
     );

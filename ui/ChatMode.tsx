@@ -1,4 +1,5 @@
 import * as React from 'react';
+// ChatMode component
 import SmartReviewerPlugin from '../main';
 import { LLMService } from '../LLMService';
 import { SkeletonLoader } from './SkeletonLoader';
@@ -24,6 +25,17 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
         plugin.settings.apiBaseUrl, 
         plugin.settings.modelName
     ]);
+
+    const isZh = plugin.settings.language === 'zh';
+    const t = {
+        title: isZh ? '与导师对话' : 'Chat with Tutor',
+        clear: isZh ? '清空' : 'Clear',
+        clearConfirm: isZh ? '确定要清空聊天记录吗？' : 'Clear chat history?',
+        you: isZh ? '你' : 'You',
+        tutor: isZh ? '导师' : 'Tutor',
+        placeholder: isZh ? '输入问题...' : 'Ask a question...',
+        send: isZh ? '发送' : 'Send',
+    };
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -56,20 +68,34 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
 
     return (
         <div className="chat-mode">
+            <div className="chat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h3 style={{ margin: 0 }}>{t.title}</h3>
+                {messages.length > 0 && (
+                    <button 
+                        onClick={() => {
+                            if (confirm(t.clearConfirm)) {
+                                setMessages([]);
+                            }
+                        }}
+                        title={t.clear}
+                        style={{ padding: '4px 8px', fontSize: '12px' }}
+                    >
+                        🗑️ {t.clear}
+                    </button>
+                )}
+            </div>
             <div className="messages">
                 {messages.map((m, i) => (
                     <div key={i} className={`message ${m.role}`}>
-                        <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong>
                         {m.role === 'assistant' ? (
                             <MarkdownContent content={m.content} plugin={plugin} />
                         ) : (
-                            <p>{m.content}</p>
+                            <p style={{ margin: 0 }}>{m.content}</p>
                         )}
                     </div>
                 ))}
                 {loading && (
                     <div className="message assistant">
-                        <strong>Tutor:</strong>
                         <SkeletonLoader />
                     </div>
                 )}
@@ -79,7 +105,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
                     value={input} 
                     onChange={(e) => setInput(e.target.value)}
                     disabled={loading}
-                    placeholder="Ask a question..."
+                    placeholder={t.placeholder}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
@@ -87,7 +113,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ plugin }) => {
                         }
                     }}
                 />
-                <button onClick={sendMessage} disabled={loading || !input.trim()}>Send</button>
+                <button onClick={sendMessage} disabled={loading || !input.trim()}>{t.send}</button>
             </div>
         </div>
     );

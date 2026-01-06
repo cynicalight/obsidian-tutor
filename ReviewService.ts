@@ -1,4 +1,4 @@
-import { TFile, App } from 'obsidian';
+import { TFile, App, HeadingCache } from 'obsidian';
 import * as Diff from 'diff';
 import * as LZString from 'lz-string';
 import SmartReviewerPlugin from './main';
@@ -11,6 +11,47 @@ export class ReviewService {
     constructor(app: App, plugin: SmartReviewerPlugin) {
         this.app = app;
         this.plugin = plugin;
+    }
+
+    getHeadings(file: TFile): HeadingCache[] {
+        const cache = this.app.metadataCache.getFileCache(file);
+        return cache?.headings || [];
+    }
+
+    async getContentForHeadings(file: TFile, headings: HeadingCache[]): Promise<string> {
+        const content = await this.app.vault.read(file);
+        const allHeadings = this.getHeadings(file);
+        let extractedContent = '';
+
+        for (const heading of headings) {
+            const startOffset = heading.position.end.offset;
+            
+            // Find the end index
+            // The section ends at the start of the next heading of the same or higher level (lower number)
+            // Or the end of the file
+            let endOffset = content.length;
+            
+            const currentIndex = allHeadings.findIndex(h => 
+                h.heading === heading.heading && 
+                h.level === heading.level && 
+                h.position.start.line === heading.position.start.line
+            );
+
+            if (currentIndex !== -1) {
+                for (let i = currentIndex + 1; i < allHeadings.length; i++) {
+                    const nextHeading = allHeadings[i];
+                    if (nextHeading.level <= heading.level) {
+                        endOffset = nextHeading.position.start.offset;
+                        break;
+                    }
+                }
+            }
+
+            extractedContent += `\n\n--- Section: ${heading.heading} ---\n`;
+            extractedContent += content.substring(startOffset, endOffset);
+        }
+
+        return extractedContent;
     }
 
     async getNewContent(file: TFile): Promise<string> {

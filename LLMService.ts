@@ -8,6 +8,12 @@ export class LLMService {
         this.settings = settings;
     }
 
+    private getLanguageInstruction(): string {
+        return this.settings.language === 'zh'
+            ? " Please respond in Chinese (Simplified)."
+            : " Please respond in English.";
+    }
+
     async callLLM(messages: any[]): Promise<string> {
         if (!this.settings.apiKey) {
             throw new Error('API Key is missing. Please configure it in settings.');
@@ -58,7 +64,7 @@ export class LLMService {
 
     async generateQuestions(context: string): Promise<string[]> {
         const messages = [
-            { role: 'system', content: this.settings.systemPromptQuiz },
+            { role: 'system', content: this.settings.systemPromptQuiz + this.getLanguageInstruction() },
             { role: 'user', content: `Here is the note content:\n\n${context}` }
         ];
 
@@ -83,7 +89,7 @@ export class LLMService {
             .replace('{context}', noteContext);
 
         const messages = [
-            { role: 'system', content: "You are a helpful tutor." }, // System prompt is partly in the user message template in settings, but we can also set a base system prompt.
+            { role: 'system', content: "You are a helpful tutor." + this.getLanguageInstruction() }, // System prompt is partly in the user message template in settings, but we can also set a base system prompt.
             { role: 'user', content: prompt }
         ];
 
@@ -92,7 +98,7 @@ export class LLMService {
 
     async chatWithNote(query: string, noteContext: string): Promise<string> {
         const messages = [
-            { role: 'system', content: "You are a helpful assistant answering questions based on the provided note content." },
+            { role: 'system', content: "You are a helpful assistant answering questions based on the provided note content." + this.getLanguageInstruction() },
             { role: 'user', content: `Context:\n${noteContext}\n\nQuestion: ${query}` }
         ];
 

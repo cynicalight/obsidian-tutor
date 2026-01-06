@@ -64,8 +64,7 @@
 
 /* Cards (Questions, Evaluations, Messages) */
 .question-block,
-.evaluation-block,
-.message {
+.evaluation-block {
   background-color: var(--background-secondary);
   padding: 16px;
   border-radius: var(--tutor-radius-lg);
@@ -73,6 +72,20 @@
   box-shadow: var(--tutor-shadow-soft);
   margin-bottom: 16px;
   transition: var(--tutor-transition);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.message {
+  background-color: var(--background-secondary);
+  padding: 8px 12px;
+  border-radius: var(--tutor-radius-lg);
+  border: var(--tutor-border-subtle);
+  box-shadow: var(--tutor-shadow-soft);
+  margin-bottom: 16px;
+  transition: var(--tutor-transition);
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .question-block:hover,
@@ -115,6 +128,14 @@
   line-height: 1.5;
 }
 
+.message > *:first-child {
+  margin-top: 0;
+}
+
+.message > *:last-child {
+  margin-bottom: 0;
+}
+
 .message.user {
   align-self: flex-end;
   background-color: var(--interactive-accent);
@@ -126,6 +147,27 @@
   align-self: flex-start;
   background-color: var(--background-secondary);
   border-bottom-left-radius: 2px;
+}
+
+/* Compact Markdown content for chat */
+.tutor-markdown-content > *:first-child {
+  margin-top: 0 !important;
+}
+
+.tutor-markdown-content > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+.tutor-markdown-content p {
+  margin-block-start: 4px;
+  margin-block-end: 4px;
+}
+
+.tutor-markdown-content ul,
+.tutor-markdown-content ol {
+  margin-block-start: 4px;
+  margin-block-end: 4px;
+  padding-inline-start: 20px;
 }
 
 .input-area {
