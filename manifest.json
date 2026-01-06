@@ -1,7 +1,7 @@
 {
 	"id": "tutor",
 	"name": "Tutor",
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"minAppVersion": "0.15.0",
 	"description": "An intelligent review assistant using LLMs.",
 	"author": "Jie Zhang",
