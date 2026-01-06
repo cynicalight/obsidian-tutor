@@ -25,7 +25,7 @@ export default class SmartReviewerPlugin extends Plugin {
 
         this.addCommand({
             id: 'open-smart-reviewer',
-            name: 'Open Smart Reviewer',
+            name: 'Open smart reviewer',
             callback: () => {
                 // Explicitly ignore the promise to satisfy linter
                 void this.activateView();
@@ -86,11 +86,11 @@ class SmartReviewerSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Tutor settings')
+            .setName('General')
             .setHeading();
 
         new Setting(containerEl)
-            .setName('API Key')
+            .setName('API key')
             .setDesc('Enter your OpenAI/DeepSeek API Key')
             .addText(text => text
                 .setPlaceholder('sk-...')
@@ -101,7 +101,7 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('API Base URL')
+            .setName('API base URL')
             .setDesc('Base URL for the LLM API (e.g., https://api.openai.com/v1)')
             .addText(text => text
                 .setPlaceholder('https://api.openai.com/v1')
@@ -112,7 +112,7 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Model Name')
+            .setName('Model name')
             .setDesc('Model to use (e.g., gpt-3.5-turbo, deepseek-chat)')
             .addText(text => text
                 .setPlaceholder('gpt-3.5-turbo')
@@ -139,7 +139,7 @@ class SmartReviewerSettingTab extends PluginSettingTab {
             .setHeading();
 
         new Setting(containerEl)
-            .setName('Quiz Generator Prompt')
+            .setName('Quiz generator prompt')
             .setDesc('System prompt for generating questions.')
             .addTextArea(text => text
                 .setPlaceholder('You are...')
@@ -150,7 +150,7 @@ class SmartReviewerSettingTab extends PluginSettingTab {
                 }));
 
         new Setting(containerEl)
-            .setName('Answer Evaluator Prompt')
+            .setName('Answer evaluator prompt')
             .setDesc('System prompt for evaluating answers.')
             .addTextArea(text => text
                 .setPlaceholder('You are...')

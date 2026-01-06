@@ -58,9 +58,10 @@ export const ChatMode: React.FC<ChatModeProps> = ({ context }) => {
         try {
             const response = await llmService.chatWithNote(userMsg.content, fileContext);
             setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-        } catch (e: any) {
+        } catch (e) {
             console.error('Chat Error:', e);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: ' + (e.message || String(e)) }]);
+            const error = e as Error;
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: ' + (error.message || String(e)) }]);
         } finally {
             setLoading(false);
         }

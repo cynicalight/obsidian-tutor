@@ -82,9 +82,10 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
             setQuestions(generatedQuestions);
             setAnswers(new Array(generatedQuestions.length).fill(''));
             setStatus('quiz');
-        } catch (e: any) {
+        } catch (e) {
             console.error(e);
-            new Notice(t.error + ': ' + e.message);
+            const error = e as Error;
+            new Notice(t.error + ': ' + (error.message || String(e)));
             setStatus('idle');
         }
     };
@@ -102,9 +103,10 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
             setQuestions(generatedQuestions);
             setAnswers(new Array(generatedQuestions.length).fill(''));
             setStatus('quiz');
-        } catch (e: any) {
+        } catch (e) {
             console.error(e);
-            new Notice(t.error + ': ' + e.message);
+            const error = e as Error;
+            new Notice(t.error + ': ' + (error.message || String(e)));
             setStatus('idle');
         }
     };
@@ -146,9 +148,10 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
             if (currentFile) {
                 await reviewService.saveSnapshot(currentFile, 'Completed');
             }
-        } catch (e: any) {
+        } catch (e) {
             console.error(e);
-            new Notice(t.error + ': ' + e.message);
+            const error = e as Error;
+            new Notice(t.error + ': ' + (error.message || String(e)));
             setStatus('quiz');
         }
     };

@@ -14,7 +14,7 @@ export class LLMService {
             : " Please respond in English.";
     }
 
-    async callLLM(messages: any[]): Promise<string> {
+    async callLLM(messages: { role: string; content: string }[]): Promise<string> {
         if (!this.settings.apiKey) {
             throw new Error('API Key is missing. Please configure it in settings.');
         }
