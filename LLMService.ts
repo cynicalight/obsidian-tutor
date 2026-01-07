@@ -9,9 +9,10 @@ export class LLMService {
     }
 
     private getLanguageInstruction(): string {
-        return this.settings.language === 'zh'
+        const langPart = this.settings.language === 'zh'
             ? " Please respond in Chinese (Simplified)."
             : " Please respond in English.";
+        return langPart + " ALWAYS use $...$ for inline math and $$...$$ for block math. Do NOT use \\( ... \\) or \\[ ... \\].";
     }
 
     async callLLM(messages: { role: string; content: string }[]): Promise<string> {

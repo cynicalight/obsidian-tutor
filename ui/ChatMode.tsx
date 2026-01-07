@@ -79,7 +79,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ context }) => {
 
     return (
         <div className="chat-mode">
-            <div className="chat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <div className="chat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
                 <h3 style={{ margin: 0 }}>{t.title}</h3>
                 {messages.length > 0 && (
                     <button 

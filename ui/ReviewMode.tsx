@@ -284,7 +284,7 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
 
     return (
         <div className="review-mode">
-            <div className="review-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <div className="review-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
                 <h3 style={{ margin: 0 }}>{t.reviewTitle}</h3>
                 {status !== 'idle' && status !== 'loading' && (
                     <button 
@@ -296,7 +296,9 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
                     </button>
                 )}
             </div>
-            {renderContent()}
+            <div className="review-content" style={{ flex: 1, overflowY: 'auto' }}>
+                {renderContent()}
+            </div>
         </div>
     );
 };

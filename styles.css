@@ -19,8 +19,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%; /* Ensure full width */
   padding: 16px;
   background-color: var(--background-primary);
+  box-sizing: border-box;
+  overflow: hidden; /* Ensure parent doesn't scroll */
+}
+
+.smart-reviewer-container * {
+  box-sizing: border-box;
 }
 
 /* Navigation Buttons */
@@ -31,6 +38,7 @@
   background: var(--background-secondary);
   padding: 4px;
   border-radius: var(--tutor-radius-lg);
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .nav-buttons button {
@@ -58,8 +66,18 @@
 
 .content-area {
   flex: 1;
-  overflow-y: auto;
-  padding-right: 4px; /* Space for scrollbar */
+  overflow: hidden; /* Prevent container from scrolling, let children scroll */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Critical for nested flex scrolling */
+}
+
+.review-mode,
+.chat-mode {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Cards (Questions, Evaluations, Messages) */
@@ -77,11 +95,6 @@
 }
 
 .message {
-  background-color: var(--background-secondary);
-  padding: 8px 12px;
-  border-radius: var(--tutor-radius-lg);
-  border: var(--tutor-border-subtle);
-  box-shadow: var(--tutor-shadow-soft);
   margin-bottom: 16px;
   transition: var(--tutor-transition);
   user-select: text;
@@ -124,8 +137,7 @@
 }
 
 .message {
-  max-width: 85%;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .message > *:first-child {
@@ -138,15 +150,21 @@
 
 .message.user {
   align-self: flex-end;
+  max-width: 85%;
   background-color: var(--interactive-accent);
   color: var(--text-on-accent);
+  padding: 8px 12px;
+  border-radius: var(--tutor-radius-lg);
+  border: var(--tutor-border-subtle);
   border-bottom-right-radius: 2px;
+  box-shadow: var(--tutor-shadow-soft);
 }
 
 .message.assistant {
   align-self: flex-start;
-  background-color: var(--background-secondary);
-  border-bottom-left-radius: 2px;
+  width: 100%;
+  background-color: transparent;
+  padding: 0 4px;
 }
 
 /* Compact Markdown content for chat */

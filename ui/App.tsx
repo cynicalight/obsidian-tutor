@@ -27,10 +27,10 @@ export const App: React.FC<AppProps> = ({ context }) => {
                 </button>
             </div>
             <div className="content-area">
-                <div style={{ display: activeTab === 'review' ? 'block' : 'none', height: '100%' }}>
+                <div style={{ display: activeTab === 'review' ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
                     <ReviewMode context={context} />
                 </div>
-                <div style={{ display: activeTab === 'chat' ? 'block' : 'none', height: '100%' }}>
+                <div style={{ display: activeTab === 'chat' ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
                     <ChatMode context={context} />
                 </div>
             </div>
