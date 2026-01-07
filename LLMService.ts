@@ -15,7 +15,7 @@ export class LLMService {
         return langPart + " ALWAYS use $...$ for inline math and $$...$$ for block math. Do NOT use \\( ... \\) or \\[ ... \\].";
     }
 
-    async callLLM(messages: { role: string; content: string }[]): Promise<string> {
+    async callLLM(messages: { role: string; content: string | any[] }[], modelOverride?: string): Promise<string> {
         if (!this.settings.apiKey) {
             throw new Error('API Key is missing. Please configure it in settings.');
         }
@@ -25,7 +25,7 @@ export class LLMService {
         const url = `${baseUrl}/chat/completions`;
 
         const body = {
-            model: this.settings.modelName,
+            model: modelOverride || this.settings.modelName,
             messages: messages,
             temperature: 0.7
         };
@@ -90,19 +90,37 @@ export class LLMService {
             .replace('{context}', noteContext);
 
         const messages = [
-            { role: 'system', content: "You are a helpful tutor." + this.getLanguageInstruction() }, // System prompt is partly in the user message template in settings, but we can also set a base system prompt.
+            { role: 'system', content: "You are a helpful tutor. ALWAYS use $ delimiters for inline math (e.g. $E=mc^2$) and $$ for block math. CONSTANTLY AVOID using \\( ... \\) or separate parentheses for math." + this.getLanguageInstruction() },
             { role: 'user', content: prompt }
         ];
 
         return await this.callLLM(messages);
     }
 
-    async chatWithNote(query: string, noteContext: string): Promise<string> {
+    async chatWithNote(query: string, noteContext: string, images?: string[], modelOverride?: string): Promise<string> {
+        const systemMsg = "You are a helpful assistant answering questions based on the provided note content." + this.getLanguageInstruction();
+
+        let userContent: string | any[] = `Context:\n${noteContext}\n\nQuestion: ${query}`;
+
+        if (images && images.length > 0) {
+            userContent = [
+                { type: "text", text: userContent as string }
+            ];
+            for (const img of images) {
+                userContent.push({
+                    type: "image_url",
+                    image_url: {
+                        url: img.startsWith('data:') ? img : `data:image/jpeg;base64,${img}`
+                    }
+                });
+            }
+        }
+
         const messages = [
-            { role: 'system', content: "You are a helpful assistant answering questions based on the provided note content." + this.getLanguageInstruction() },
-            { role: 'user', content: `Context:\n${noteContext}\n\nQuestion: ${query}` }
+            { role: 'system', content: systemMsg },
+            { role: 'user', content: userContent }
         ];
 
-        return await this.callLLM(messages);
+        return await this.callLLM(messages, modelOverride);
     }
 }

@@ -95,7 +95,7 @@
 }
 
 .message {
-  margin-bottom: 16px;
+  margin-bottom: 0;
   transition: var(--tutor-transition);
   user-select: text;
   -webkit-user-select: text;
@@ -132,7 +132,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0px;
   padding-bottom: 16px;
 }
 
@@ -149,21 +149,52 @@
 }
 
 .message.user {
-  align-self: flex-end;
-  max-width: 85%;
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  padding: 8px 12px;
-  border-radius: var(--tutor-radius-lg);
+  /* align-self: flex-end; Removed, handled by container */
+  /* max-width: 85%; Removed, handled by container */
+  /* padding & border-radius Moved to .message-container.user .message */
   border: var(--tutor-border-subtle);
-  border-bottom-right-radius: 2px;
-  box-shadow: var(--tutor-shadow-soft);
 }
 
 .message.assistant {
   align-self: flex-start;
   width: 100%;
   background-color: transparent;
+  padding: 0 4px;
+}
+
+/* Message Container Alignment */
+.message-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  max-width: 100%;
+}
+
+.message-container.user {
+  align-self: flex-end;
+  align-items: flex-end;
+  max-width: 85%;
+}
+
+.message-container.assistant {
+  align-self: flex-start;
+  width: 100%;
+}
+
+/* User Bubble override inside container */
+.message-container.user .message {
+  max-width: 100%; /* Let container constrain it */
+  align-self: flex-end;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  padding: 8px 12px;
+  border-radius: var(--tutor-radius-lg);
+  border-bottom-right-radius: 2px;
+  box-shadow: var(--tutor-shadow-soft);
+}
+
+.message-container.assistant .message {
+  width: 100%;
   padding: 0 4px;
 }
 
@@ -250,4 +281,95 @@
   100% {
     background-position: -200% 0;
   }
+}
+
+/* Chat Toolbar & New Inputs */
+.message-container .message-toolbar {
+  opacity: 0 !important; /* Start hidden */
+  transition: opacity 0.2s ease;
+  pointer-events: none; /* Prevent accidental clicks when hidden */
+}
+
+.message-container:hover .message-toolbar {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  border-radius: 4px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: none !important;
+  height: 24px;
+  width: 24px;
+}
+
+.icon-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+  transform: none !important;
+}
+
+/* Footer Styling */
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.model-selector select {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  appearance: none;
+  font-family: var(--font-interface);
+  text-align: center;
+  text-align-last: center; /* For Chrome/Safari */
+}
+
+.model-selector select:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.model-selector select:focus {
+  outline: none;
+  color: var(--text-normal);
+}
+
+.send-btn {
+  background: transparent !important;
+  border: none !important;
+  padding: 6px !important;
+  color: var(--interactive-accent) !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  box-shadow: none !important;
+}
+
+.send-btn:hover {
+  background-color: var(--background-modifier-hover) !important;
+  transform: none !important;
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

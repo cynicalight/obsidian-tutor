@@ -4,6 +4,7 @@ import { ReviewService } from '../ReviewService';
 import { LLMService } from '../LLMService';
 import { TFile, HeadingCache, Notice } from 'obsidian';
 import { SkeletonLoader } from './SkeletonLoader';
+import { MarkdownContent } from './MarkdownContent';
 
 interface ReviewModeProps {
     context: TutorContext;
@@ -250,7 +251,10 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
                 <>
                     {questions.map((q, i) => (
                         <div key={i} className="question-block">
-                            <p><strong>{t.question}{i+1}:</strong> {q}</p>
+                            <div style={{marginBottom: '0.5em'}}>
+                                <strong>{t.question}{i+1}:</strong> 
+                                <MarkdownContent content={q} context={context} />
+                            </div>
                             <textarea 
                                 value={answers[i]} 
                                 onChange={(e) => {
@@ -271,9 +275,15 @@ export const ReviewMode: React.FC<ReviewModeProps> = ({ context }) => {
                  <>
                     {evaluations.map((evalText, i) => (
                         <div key={i} className="evaluation-block">
-                            <p><strong>Q:</strong> {questions[i]}</p>
+                            <div style={{marginBottom: '0.5em'}}>
+                                <strong>Q:</strong> 
+                                <MarkdownContent content={questions[i]} context={context} />
+                            </div>
                             <p><strong>A:</strong> {answers[i]}</p>
-                            <p><strong>{t.feedback}</strong> {evalText}</p>
+                            <div>
+                                <strong>{t.feedback}</strong>
+                                <MarkdownContent content={evalText} context={context} />
+                            </div>
                         </div>
                     ))}
                     <button onClick={() => setStatus('idle')}>{t.doneBtn}</button>
